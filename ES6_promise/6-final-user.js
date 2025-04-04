@@ -8,8 +8,8 @@ export default function handleProfileSignup(firstName, lastName, fileName) {
       results.forEach((promise) => {
         promises.push({
           status: promise.status,
-          value: promise.status === 'fulfilled' 
-            ? promise.value 
+          value: promise.status === 'fulfilled'
+            ? promise.value
             : `${promise.reason.name}: ${promise.reason.message}`,
         });
       });
