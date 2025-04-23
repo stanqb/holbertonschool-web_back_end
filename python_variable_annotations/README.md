@@ -32,4 +32,5 @@ This project focuses on implementing type annotations in Python 3. It covers fun
 - MyPy cheat sheet
 
 ## Author
-Emmanuel Turlay, Staff Software Engineer at Cruise
+Stan QUEUNIEZ
+
