@@ -18,6 +18,12 @@ async def measure_runtime() -> float:
 
     Returns:
         float: Total runtime in seconds
+
+    The total runtime is roughly 10 seconds because each async_comprehension
+    function collects 10 numbers from async_generator, and each number
+    generation takes 1 second (due to asyncio.sleep(1)). However, since we
+    run 4 instances in parallel with asyncio.gather, they all share the same
+    10-second timeframe instead of running sequentially (which would be 40s).
     """
     start_time = time.perf_counter()
 
