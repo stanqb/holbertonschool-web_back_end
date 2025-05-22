@@ -1,5 +1,4 @@
 const fs = require('fs');
-
 const readDatabase = (filePath) => new Promise((resolve, reject) => {
   fs.readFile(filePath, 'utf-8', (err, data) => {
     if (err) {
@@ -30,5 +29,4 @@ const readDatabase = (filePath) => new Promise((resolve, reject) => {
     resolve(grouped);
   });
 });
-
 module.exports = readDatabase;
