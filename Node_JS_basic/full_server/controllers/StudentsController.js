@@ -1,55 +1,46 @@
-import readDatabase from '../utils';
-import path from 'path';
+const readDatabase = require('../utils');
 
 class StudentsController {
-  static getAllStudents(request, response) {
-    // Use a fixed path to the database
-    const dbFile = path.resolve(process.cwd(), 'database.csv');
-    
-    readDatabase(dbFile)
-      .then((studentsByField) => {
-        let responseText = 'This is the list of our students\n';
-        
-        // Get fields sorted alphabetically (case insensitive)
-        const sortedFields = Object.keys(studentsByField).sort((a, b) => 
-          a.localeCompare(b, 'en', { sensitivity: 'base' })
-        );
-        
-        for (const field of sortedFields) {
-          const students = studentsByField[field];
-          responseText += `Number of students in ${field}: ${students.length}. List: ${students.join(', ')}\n`;
-        }
-        
-        response.status(200).send(responseText);
-      })
-      .catch((error) => {
-        response.status(500).send(error.message);
-      });
-  }
+ static getAllStudents(request, response) {
+   const databaseFile = process.argv[2] || '';
 
-  static getAllStudentsByMajor(request, response) {
-    const dbFile = path.resolve(process.cwd(), 'database.csv');
-    const { major } = request.params;
-    
-    if (major !== 'CS' && major !== 'SWE') {
-      response.status(500).send('Major parameter must be CS or SWE');
-      return;
-    }
-    
-    readDatabase(dbFile)
-      .then((studentsByField) => {
-        if (!studentsByField[major]) {
-          response.status(500).send(`No students found for major ${major}`);
-          return;
-        }
-        
-        const students = studentsByField[major];
-        response.status(200).send(`List: ${students.join(', ')}`);
-      })
-      .catch((error) => {
-        response.status(500).send(error.message);
-      });
-  }
+   readDatabase(databaseFile)
+     .then((fields) => {
+       let responseText = 'This is the list of our students\n';
+       const sortedFields = Object.keys(fields).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+
+       sortedFields.forEach((field) => {
+         responseText += `Number of students in ${field}: ${fields[field].length}. List: ${fields[field].join(', ')}\n`;
+       });
+
+       response.status(200).send(responseText);
+     })
+     .catch(() => {
+       response.status(500).send('Cannot load the database');
+     });
+ }
+
+ static getAllStudentsByMajor(request, response) {
+   const databaseFile = process.argv[2] || '';
+   const { major } = request.params;
+
+   if (major !== 'CS' && major !== 'SWE') {
+     response.status(500).send('Major parameter must be CS or SWE');
+     return;
+   }
+
+   readDatabase(databaseFile)
+     .then((fields) => {
+       if (fields[major]) {
+         response.status(200).send(`List: ${fields[major].join(', ')}`);
+       } else {
+         response.status(200).send('List: ');
+       }
+     })
+     .catch(() => {
+       response.status(500).send('Cannot load the database');
+     });
+ }
 }
 
-export default StudentsController;
+module.exports = StudentsController;
