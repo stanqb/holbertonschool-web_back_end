@@ -16,7 +16,7 @@ function countStudents(path) {
       if (students > 0) {
         students -= 1;
       }
-      let output = `Number of students: ${students}\n`;
+      console.log(`Number of students: ${students}`);
       const classrooms = [];
       lines.slice(1).forEach((line) => {
         const parts = line.split(',');
@@ -38,9 +38,9 @@ function countStudents(path) {
         }
       });
       classrooms.forEach((field) => {
-        output += `Number of students in ${field}: ${grouped[field].length}. List: ${grouped[field].join(', ')}\n`;
+        console.log(`Number of students in ${field}: ${grouped[field].length}. List: ${grouped[field].join(', ')}`);
       });
-      resolve(output);
+      resolve();
     });
   });
 }
@@ -51,17 +51,16 @@ app.get('/', (req, res) => {
   res.send('Hello Holberton School!');
 });
 
-app.get('/students', (req, res) => {
+app.get('/students', async (req, res) => {
   res.write('This is the list of our students\n');
-  countStudents(process.argv[2])
-    .then((data) => {
-      res.end(data);
-    })
-    .catch((error) => {
-      res.end(error.message);
-    });
+  try {
+    await countStudents(process.argv[2]);
+    res.end();
+  } catch (error) {
+    res.end(error.message);
+  }
 });
 
-app.listen(1245, () => {});
+app.listen(1245);
 
 module.exports = app;

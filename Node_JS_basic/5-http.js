@@ -16,7 +16,7 @@ function countStudents(path) {
       if (students > 0) {
         students -= 1;
       }
-      let output = `Number of students: ${students}\n`;
+      console.log(`Number of students: ${students}`);
       const classrooms = [];
       lines.slice(1).forEach((line) => {
         const parts = line.split(',');
@@ -38,32 +38,32 @@ function countStudents(path) {
         }
       });
       classrooms.forEach((field) => {
-        output += `Number of students in ${field}: ${grouped[field].length}. List: ${grouped[field].join(', ')}\n`;
+        console.log(`Number of students in ${field}: ${grouped[field].length}. List: ${grouped[field].join(', ')}`);
       });
-      resolve(output);
+      resolve();
     });
   });
 }
 
-const app = http.createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
+const app = http.createServer(async (req, res) => {
+  res.statusCode = 200;
+  res.setHeader('Content-Type', 'text/plain');
   
   if (req.url === '/') {
     res.end('Hello Holberton School!');
   } else if (req.url === '/students') {
     res.write('This is the list of our students\n');
-    countStudents(process.argv[2])
-      .then((data) => {
-        res.end(data);
-      })
-      .catch((error) => {
-        res.end(error.message);
-      });
+    try {
+      await countStudents(process.argv[2]);
+      res.end();
+    } catch (error) {
+      res.end(error.message);
+    }
   } else {
     res.end('Hello Holberton School!');
   }
 });
 
-app.listen(1245, () => {});
+app.listen(1245);
 
 module.exports = app;
