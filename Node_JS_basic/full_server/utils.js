@@ -1,25 +1,33 @@
 const fs = require('fs');
 
 const readDatabase = (filePath) => new Promise((resolve, reject) => {
-  fs.readFile(filePath, 'utf8', (err, data) => {
+  fs.readFile(filePath, 'utf-8', (err, data) => {
     if (err) {
       reject(new Error('Cannot load the database'));
       return;
     }
-    
-    const lines = data.split('\n').filter((line) => line.trim() !== '');
-    const students = lines.slice(1);
-    
-    const fields = {};
-    students.forEach((student) => {
-      const [firstname, , , field] = student.split(',');
-      if (!fields[field]) {
-        fields[field] = [];
+    const lines = data.split('\n');
+    const classrooms = [];
+    lines.slice(1).forEach((line) => {
+      const parts = line.split(',');
+      const field = parts[3];
+      if (field && !classrooms.includes(field)) {
+        classrooms.push(field);
       }
-      fields[field].push(firstname);
     });
-    
-    resolve(fields);
+    const grouped = {};
+    classrooms.forEach((field) => {
+      grouped[field] = [];
+    });
+    lines.slice(1).forEach((line) => {
+      const parts = line.split(',');
+      const firstname = parts[0];
+      const field = parts[3];
+      if (firstname && field) {
+        grouped[field].push(firstname);
+      }
+    });
+    resolve(grouped);
   });
 });
 
