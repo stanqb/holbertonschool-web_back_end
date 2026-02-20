@@ -25,10 +25,11 @@ class MRUCache(BaseCaching):
             return
         if key in self.cache_data:
             self.cache_data.move_to_end(key)
-        self.cache_data[key] = item
-        if len(self.cache_data) > BaseCaching.MAX_ITEMS:
+        elif len(self.cache_data) >= BaseCaching.MAX_ITEMS:
             mru_key, _ = self.cache_data.popitem(last=True)
             print("DISCARD: {}".format(mru_key))
+        self.cache_data[key] = item
+        self.cache_data.move_to_end(key)
 
     def get(self, key):
         """Retrieve an item from the cache by key.
