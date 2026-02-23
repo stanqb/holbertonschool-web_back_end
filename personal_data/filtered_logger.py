@@ -58,3 +58,27 @@ def get_db() -> mysql.connector.connection.MySQLConnection:
         password=os.getenv("PERSONAL_DATA_DB_PASSWORD", ""),
         database=os.getenv("PERSONAL_DATA_DB_NAME")
     )
+
+
+def main() -> None:
+    """Retrieve all users from the database and log their data redacted."""
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(
+        "SELECT name, email, phone, ssn, password, ip, last_login, "
+        "user_agent FROM users;"
+    )
+    fields = ["name", "email", "phone", "ssn", "password",
+              "ip", "last_login", "user_agent"]
+    logger = get_logger()
+    for row in cursor:
+        message = "; ".join(
+            "{}={}".format(f, v) for f, v in zip(fields, row)
+        ) + ";"
+        logger.info(message)
+    cursor.close()
+    db.close()
+
+
+if __name__ == "__main__":
+    main()
