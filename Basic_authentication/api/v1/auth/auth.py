@@ -7,13 +7,21 @@ class Auth:
     """Class to manage the API authentication."""
 
     def require_auth(self, path: str, excluded_paths: List[str]) -> bool:
-        """Return False - path and excluded_paths will be used later."""
-        return False
+        """Return True if the path requires authentication."""
+        if path is None:
+            return True
+        if excluded_paths is None or len(excluded_paths) == 0:
+            return True
+        if not path.endswith('/'):
+            path = path + '/'
+        if path in excluded_paths:
+            return False
+        return True
 
     def authorization_header(self, request=None) -> str:
         """Return None - request will be the Flask request object."""
         return None
 
-    def current_user(self, request=None) -> TypeVar('User'):  # type: ignore
+    def current_user(self, request=None) -> TypeVar('User'):
         """Return None - request will be the Flask request object."""
         return None
