@@ -35,8 +35,8 @@ class DB:
         return user
 
     def find_user_by(self, **kwargs) -> User:
-        """Find and return the first user matching the given
-        keyword arguments."""
+        """Find and return the first user 
+        matching the given keyword arguments."""
         try:
             user = self._session.query(User).filter_by(**kwargs).one()
         except NoResultFound:
@@ -44,3 +44,13 @@ class DB:
         except InvalidRequestError:
             raise InvalidRequestError
         return user
+
+    def update_user(self, user_id: int, **kwargs) -> None:
+        """Update a user's attributes by user_id
+        and commit changes to the database."""
+        user = self.find_user_by(id=user_id)
+        for key, value in kwargs.items():
+            if not hasattr(user, key):
+                raise ValueError
+            setattr(user, key, value)
+        self._session.commit()
