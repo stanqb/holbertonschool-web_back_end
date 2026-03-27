@@ -27,6 +27,10 @@ def view_one_user(user_id: str = None) -> str:
     """
     if user_id is None:
         abort(404)
+    if user_id == "me":
+        if request.current_user is None:
+            abort(404)
+        return jsonify(request.current_user.to_json())
     user = User.get(user_id)
     if user is None:
         abort(404)
@@ -67,7 +71,7 @@ def create_user() -> str:
     error_msg = None
     try:
         rj = request.get_json()
-    except Exception as e:
+    except Exception:
         rj = None
     if rj is None:
         error_msg = "Wrong format"
@@ -110,7 +114,7 @@ def update_user(user_id: str = None) -> str:
     rj = None
     try:
         rj = request.get_json()
-    except Exception as e:
+    except Exception:
         rj = None
     if rj is None:
         return jsonify({'error': "Wrong format"}), 400
