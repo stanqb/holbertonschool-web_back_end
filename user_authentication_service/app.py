@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Flask app module providing
-the web interface for the authentication service."""
+"""Flask app module providing the web
+interface for the authentication service."""
 from flask import Flask, jsonify, request, abort, make_response, redirect
 from auth import Auth
 
@@ -58,6 +58,17 @@ def profile() -> str:
     if user is None:
         abort(403)
     return jsonify({"email": user.email}), 200
+
+
+@app.route("/reset_password", methods=["POST"])
+def get_reset_password_token() -> str:
+    """Return a reset password token for the user."""
+    email = request.form.get("email")
+    try:
+        reset_token = AUTH.get_reset_password_token(email)
+        return jsonify({"email": email, "reset_token": reset_token}), 200
+    except ValueError:
+        abort(403)
 
 
 if __name__ == "__main__":
