@@ -1,15 +1,21 @@
 #!/usr/bin/env python3
 """Auth module providing authentication utilities."""
 import bcrypt
+import uuid
 from db import DB
 from user import User
 from sqlalchemy.orm.exc import NoResultFound
 
 
 def _hash_password(password: str) -> bytes:
-    """Hash a password string using bcrypt
-    and return the salted hash as bytes."""
+    """Hash a password string using
+    bcrypt and return the salted hash as bytes."""
     return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+
+
+def _generate_uuid() -> str:
+    """Generate and return a string representation of a new UUID."""
+    return str(uuid.uuid4())
 
 
 class Auth:
@@ -28,8 +34,8 @@ class Auth:
             return self._db.add_user(email, _hash_password(password))
 
     def valid_login(self, email: str, password: str) -> bool:
-        """Validate user credentials and
-        return True if correct, False otherwise."""
+        """Validate user credentials
+        and return True if correct, False otherwise."""
         try:
             user = self._db.find_user_by(email=email)
             return bcrypt.checkpw(password.encode("utf-8"),
