@@ -35,7 +35,7 @@ class DB:
         return user
 
     def find_user_by(self, **kwargs) -> User:
-        """Find and return the first user 
+        """Find and return the first user
         matching the given keyword arguments."""
         try:
             user = self._session.query(User).filter_by(**kwargs).one()
