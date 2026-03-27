@@ -8,8 +8,8 @@ from sqlalchemy.orm.exc import NoResultFound
 
 
 def _hash_password(password: str) -> bytes:
-    """Hash a password string using
-    bcrypt and return the salted hash as bytes."""
+    """Hash a password string using bcrypt
+    and return the salted hash as bytes."""
     return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
 
 
@@ -34,11 +34,21 @@ class Auth:
             return self._db.add_user(email, _hash_password(password))
 
     def valid_login(self, email: str, password: str) -> bool:
-        """Validate user credentials
-        and return True if correct, False otherwise."""
+        """Validate user credentials and return True
+        if correct, False otherwise."""
         try:
             user = self._db.find_user_by(email=email)
             return bcrypt.checkpw(password.encode("utf-8"),
                                   user.hashed_password)
         except NoResultFound:
             return False
+
+    def create_session(self, email: str) -> str:
+        """Create a session for the user and return the session ID."""
+        try:
+            user = self._db.find_user_by(email=email)
+            session_id = _generate_uuid()
+            self._db.update_user(user.id, session_id=session_id)
+            return session_id
+        except NoResultFound:
+            return None
