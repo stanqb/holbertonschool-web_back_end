@@ -8,8 +8,8 @@ from sqlalchemy.orm.exc import NoResultFound
 
 
 def _hash_password(password: str) -> bytes:
-    """Hash a password string using bcrypt
-    and return the salted hash as bytes."""
+    """Hash a password string using
+    bcrypt and return the salted hash as bytes."""
     return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
 
 
@@ -61,3 +61,18 @@ class Auth:
             return self._db.find_user_by(session_id=session_id)
         except NoResultFound:
             return None
+
+    def destroy_session(self, user_id: int) -> None:
+        """Set the session ID of the user to None."""
+        self._db.update_user(user_id, session_id=None)
+        return None
+
+    def get_reset_password_token(self, email: str) -> str:
+        """Generate a reset password token for the user and return it."""
+        try:
+            user = self._db.find_user_by(email=email)
+        except NoResultFound:
+            raise ValueError
+        reset_token = _generate_uuid()
+        self._db.update_user(user.id, reset_token=reset_token)
+        return reset_token
