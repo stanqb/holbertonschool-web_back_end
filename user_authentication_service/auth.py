@@ -34,8 +34,8 @@ class Auth:
             return self._db.add_user(email, _hash_password(password))
 
     def valid_login(self, email: str, password: str) -> bool:
-        """Validate user credentials and return True
-        if correct, False otherwise."""
+        """Validate user credentials and
+        return True if correct, False otherwise."""
         try:
             user = self._db.find_user_by(email=email)
             return bcrypt.checkpw(password.encode("utf-8"),
@@ -50,5 +50,14 @@ class Auth:
             session_id = _generate_uuid()
             self._db.update_user(user.id, session_id=session_id)
             return session_id
+        except NoResultFound:
+            return None
+
+    def get_user_from_session_id(self, session_id: str) -> User:
+        """Return the user corresponding to the session ID or None."""
+        if session_id is None:
+            return None
+        try:
+            return self._db.find_user_by(session_id=session_id)
         except NoResultFound:
             return None
