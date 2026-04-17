@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Flask app module providing the web
 interface for the authentication service."""
-from flask import Flask, jsonify, request, abort, make_response, redirect
+from flask import Flask, jsonify, request, abort, redirect
 from auth import Auth
 
 app = Flask(__name__)
@@ -15,13 +15,13 @@ def index() -> str:
 
 
 @app.route("/users", methods=["POST"])
-def users() -> tuple:
+def users() -> str:
     """Register a new user and return a confirmation message."""
     email = request.form.get("email")
     password = request.form.get("password")
     try:
         user = AUTH.register_user(email, password)
-        return jsonify({"email": user.email, "message": "user created"}), 200
+        return jsonify({"email": user.email, "message": "user created"})
     except ValueError:
         return jsonify({"message": "email already registered"}), 400
 
@@ -34,7 +34,7 @@ def login() -> str:
     if not AUTH.valid_login(email, password):
         abort(401)
     session_id = AUTH.create_session(email)
-    response = make_response(jsonify({"email": email, "message": "logged in"}))
+    response = jsonify({"email": email, "message": "logged in"})
     response.set_cookie("session_id", session_id)
     return response
 
@@ -57,7 +57,7 @@ def profile() -> str:
     user = AUTH.get_user_from_session_id(session_id)
     if user is None:
         abort(403)
-    return jsonify({"email": user.email}), 200
+    return jsonify({"email": user.email})
 
 
 @app.route("/reset_password", methods=["POST"])
@@ -66,7 +66,7 @@ def get_reset_password_token() -> str:
     email = request.form.get("email")
     try:
         reset_token = AUTH.get_reset_password_token(email)
-        return jsonify({"email": email, "reset_token": reset_token}), 200
+        return jsonify({"email": email, "reset_token": reset_token})
     except ValueError:
         abort(403)
 
@@ -79,10 +79,10 @@ def update_password() -> str:
     new_password = request.form.get("new_password")
     try:
         AUTH.update_password(reset_token, new_password)
-        return jsonify({"email": email, "message": "Password updated"}), 200
+        return jsonify({"email": email, "message": "Password updated"})
     except ValueError:
         abort(403)
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port="5000")
