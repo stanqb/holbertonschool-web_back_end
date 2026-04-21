@@ -3,7 +3,6 @@
 import unittest
 from unittest.mock import patch, Mock
 from parameterized import parameterized
-from typing import Dict
 
 from client import GithubOrgClient
 
