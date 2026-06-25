@@ -1,14 +1,27 @@
-const express = require('express');
+const { expect } = require('chai');
+const request = require('request');
 
-const app = express();
-const port = 7865;
+describe('Index page', () => {
+  const url = 'http://localhost:7865/';
 
-app.get('/', (req, res) => {
-  res.send('Welcome to the payment system');
+  it('returns status code 200', (done) => {
+    request.get(url, (error, response) => {
+      expect(response.statusCode).to.equal(200);
+      done();
+    });
+  });
+
+  it('returns the correct message in the body', (done) => {
+    request.get(url, (error, response, body) => {
+      expect(body).to.equal('Welcome to the payment system');
+      done();
+    });
+  });
+
+  it('returns a Content-Type of text/html', (done) => {
+    request.get(url, (error, response) => {
+      expect(response.headers['content-type']).to.contain('text/html');
+      done();
+    });
+  });
 });
-
-app.listen(port, () => {
-  console.log(`API available on localhost port ${port}`);
-});
-
-module.exports = app;
